@@ -9,4 +9,4 @@
 * add npm scripts
 * publish to npm
 * add automatic test in git
-* add badges (test, version, last version of dependencies useage)
+* add badges (test, version, last version of dependencies usage)
