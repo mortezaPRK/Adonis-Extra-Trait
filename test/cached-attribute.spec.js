@@ -3,16 +3,6 @@ const {ioc} = require('@adonisjs/fold');
 
 const Model = ioc.use('Model');
 
-// eslint-disable-next-line max-len
-const REDIS_COMMAND = 'if tonumber(redis.call(\'get\', KEYS[1]) or 0) < tonumber(KEYS[2]) then redis.call(\'set\', KEYS[1], KEYS[2]); redis.call(\'set\', KEYS[3], KEYS[4]) end';
-
-const {CachedAttribute, Singleton} = require('../index');
-
-const registerCustomCommand = async (redisClient) => {
-  await redisClient.script('flush');
-  await redisClient.script('load', REDIS_COMMAND);
-};
-
 test.group('CachedAttribute', (group) => {
   group.before(async () => {
     const Database = ioc.use('Database');
@@ -52,7 +42,7 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: 'f1',
             },
@@ -83,7 +73,7 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: [],
             },
@@ -114,7 +104,7 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
@@ -145,13 +135,13 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
         );
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
       }
     }
@@ -179,10 +169,10 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
@@ -240,10 +230,10 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
@@ -296,17 +286,16 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
         );
       }
     }
-    await registerCustomCommand(Redis);
     User._bootIfNotBooted();
 
     const attrs = {
@@ -348,17 +337,16 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
         );
       }
     }
-    await registerCustomCommand(Redis);
     User._bootIfNotBooted();
     let i = 0;
     const users = [...new Array(100)].map(() => {
@@ -410,17 +398,16 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
         );
       }
     }
-    await registerCustomCommand(Redis);
     User._bootIfNotBooted();
     const attrs = {
       f1: 128,
@@ -473,17 +460,16 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
         );
       }
     }
-    await registerCustomCommand(Redis);
     User._bootIfNotBooted();
     const attrs = {
       f1: 128,
@@ -540,17 +526,16 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
         );
       }
     }
-    await registerCustomCommand(Redis);
     User._bootIfNotBooted();
     const attrs = {
       f1: 128,
@@ -585,17 +570,16 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
         );
       }
     }
-    await registerCustomCommand(Redis);
     User._bootIfNotBooted();
     const attrs = {
       f1: 128,
@@ -632,17 +616,16 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
         );
       }
     }
-    await registerCustomCommand(Redis);
     User._bootIfNotBooted();
     const attrs = {
       f1: 128,
@@ -695,10 +678,10 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
               redis: secondRedis,
@@ -706,8 +689,6 @@ test.group('CachedAttribute', (group) => {
         );
       }
     }
-    await registerCustomCommand(Redis);
-    await registerCustomCommand(secondRedis);
     User._bootIfNotBooted();
 
     const cachedAttrs = {
@@ -744,17 +725,16 @@ test.group('CachedAttribute', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
         this.addTrait(
-            CachedAttribute,
+            '@provider:Prk/Traits/CachedAttribute',
             {
               fields: ['f1', 'f2'],
             },
         );
       }
     }
-    await registerCustomCommand(Redis);
     User._bootIfNotBooted();
 
     const cachedAttrs = {
