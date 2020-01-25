@@ -12,7 +12,7 @@ class CachedAttribute {
       throw new Error(`${Model.name}: fields should be a non-empty array`);
     }
     if (!Model.isSingleton) {
-      throw new Error(`${Model.name}: shoud be Singleton`);
+      throw new Error(`${Model.name}: should be Singleton`);
     }
     if (!redis) {
       // eslint-disable-next-line no-undef

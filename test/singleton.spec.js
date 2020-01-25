@@ -26,7 +26,7 @@ test.group('Singleton', (group) => {
     await Database.close();
   });
 
-  test('Registeration', async (assert) => {
+  test('Registration', async (assert) => {
     class User extends Model {
       static boot() {
         super.boot();

@@ -1,5 +1,5 @@
 {
-	"name": "adonis traits",
+	"name": "adonis extra traits",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "node",
 	"workspaceFolder": "/app",

@@ -125,12 +125,12 @@ test.group('CachedAttribute', (group) => {
 
     assert.match(
         error.message,
-        /.*: shoud be Singleton$/m,
+        /.*: should be Singleton$/m,
         `Unknown error was thrown!`,
     );
   });
 
-  test('Fail with defered Singleton', async (assert) => {
+  test('Fail with deferred Singleton', async (assert) => {
     class User extends Model {
       static boot() {
         super.boot();
@@ -159,12 +159,12 @@ test.group('CachedAttribute', (group) => {
 
     assert.match(
         error.message,
-        /.*: shoud be Singleton$/m,
+        /.*: should be Singleton$/m,
         `Unknown error was thrown!`,
     );
   });
 
-  test('Registeration', async (assert) => {
+  test('Registration', async (assert) => {
     class User extends Model {
       static boot() {
         super.boot();
@@ -252,7 +252,7 @@ test.group('CachedAttribute', (group) => {
     assert.instanceOf(
         error,
         Error,
-        'expcted warmUp to error if Database is empty',
+        'expected warmUp to error if Database is empty',
     );
     assert.match(
         error.message,
@@ -270,7 +270,7 @@ test.group('CachedAttribute', (group) => {
     assert.instanceOf(
         error,
         Error,
-        'expcted getCached to error if Database is empty',
+        'expected getCached to error if Database is empty',
     );
     assert.match(
         error.message,
@@ -372,7 +372,7 @@ test.group('CachedAttribute', (group) => {
     try {
       redisValueParsed = JSON.parse(redisValue);
     } catch (e) {
-      assert.fail(`value set incorreclty: (${redisValue}) -> ${e.message}`);
+      assert.fail(`value set incorrectly: (${redisValue}) -> ${e.message}`);
     }
 
     assert.deepEqual(
@@ -425,7 +425,7 @@ test.group('CachedAttribute', (group) => {
 
     assert.isNull(
         await Redis.get(User.cachedName),
-        'Redis values should be null after deleteing',
+        'Redis values should be null after deleting',
     );
 
     const warmUpValue = await User.warmUp();
@@ -494,7 +494,7 @@ test.group('CachedAttribute', (group) => {
 
     assert.isNull(
         await Redis.get(User.cachedName),
-        'Redis values should be null after deleteing',
+        'Redis values should be null after deleting',
     );
 
     await User.warmUp();
@@ -509,7 +509,7 @@ test.group('CachedAttribute', (group) => {
 
     assert.isNull(
         await Redis.get(User.cachedName),
-        'Redis values should be null after deleteing',
+        'Redis values should be null after deleting',
     );
 
     assert.deepEqual(
@@ -553,7 +553,7 @@ test.group('CachedAttribute', (group) => {
 
     assert.isNull(
         await Redis.get(User.cachedName),
-        'Redis values should be null after deleteing',
+        'Redis values should be null after deleting',
     );
 
     assert.deepEqual(
@@ -597,7 +597,7 @@ test.group('CachedAttribute', (group) => {
 
     assert.isNull(
         await Redis.get(User.cachedName),
-        'Redis values should be null after deleteing',
+        'Redis values should be null after deleting',
     );
 
     await User.warmUp();
@@ -643,7 +643,7 @@ test.group('CachedAttribute', (group) => {
 
     assert.isNull(
         await Redis.get(User.cachedName),
-        'Redis values should be null after deleteing',
+        'Redis values should be null after deleting',
     );
 
     const warmUpValue = await User.warmUp();
