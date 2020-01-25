@@ -1,13 +1,12 @@
 {
-  "name": "@mortz.prk/personal_npm",
-  "version": "1.0.2",
+  "name": "@mortz.prk/adonis-extra-traits",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
+  "license": "NAN",
   "devDependencies": {
     "@adonisjs/fold": "^4.0.9",
     "@adonisjs/lucid": "^6.1.3",
