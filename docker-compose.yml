@@ -1,0 +1,33 @@
+version: "3.7"
+
+volumes:
+  vscode:
+  vscode-insiders:
+
+networks:
+  web:
+
+services:
+  node:
+    image: adonis-trait-node:dev
+    build:
+      dockerfile: ./.build/Dockerfile.dev
+      context: .
+      args:
+        - NODE_VERSION=12.14
+        - USER_ID=$DEV_ENV_UID
+        - GROUP_ID=$DEV_ENV_GID
+        - EXTRA_PKGS=
+    restart: always
+    volumes:
+      - ./:/app
+      - vscode:/home/node/.vscode-server
+      - vscode-insiders:/home/node/.vscode-server-insiders
+    networks:
+      - web
+
+  redis:
+    image: redis:5-alpine
+    restart: always
+    networks:
+      - web
