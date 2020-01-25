@@ -1,0 +1,17 @@
+{
+	"name": "adonis traits",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "node",
+	"workspaceFolder": "/app",
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/ash",
+		"eslint.format.enable": true
+	},
+	"remoteUser": "node",
+	"extensions": [
+		"ms-vscode.vscode-typescript-tslint-plugin",
+		"dbaeumer.vscode-eslint",
+		"visualstudioexptteam.vscodeintellicode"
+	],
+	"shutdownAction": "stopCompose"
+}
