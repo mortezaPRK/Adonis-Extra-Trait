@@ -3,7 +3,6 @@ const {ioc} = require('@adonisjs/fold');
 
 const Model = ioc.use('Model');
 
-const {Singleton} = require('../index');
 
 test.group('Singleton', (group) => {
   group.before(async () => {
@@ -32,7 +31,7 @@ test.group('Singleton', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
       }
     }
@@ -65,7 +64,7 @@ test.group('Singleton', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
       }
     }
@@ -102,7 +101,7 @@ test.group('Singleton', (group) => {
       static boot() {
         super.boot();
         this.addTrait(
-            Singleton,
+            '@provider:Prk/Traits/Singleton',
         );
       }
     }

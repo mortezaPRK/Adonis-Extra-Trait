@@ -3,15 +3,13 @@ const {ioc} = require('@adonisjs/fold');
 
 const Model = ioc.use('Model');
 
-const {NoTimestamp} = require('../index');
-
 test.group('NoTimestamp', () => {
   test('Without options', (assert) => {
     class User extends Model {
       static boot() {
         super.boot();
         this.addTrait(
-            NoTimestamp,
+            '@provider:Prk/Traits/NoTimestamp',
         );
       }
     }
@@ -34,7 +32,7 @@ test.group('NoTimestamp', () => {
       static boot() {
         super.boot();
         this.addTrait(
-            NoTimestamp,
+            '@provider:Prk/Traits/NoTimestamp',
             {createdAt: true},
         );
       }
@@ -58,7 +56,7 @@ test.group('NoTimestamp', () => {
       static boot() {
         super.boot();
         this.addTrait(
-            NoTimestamp,
+            '@provider:Prk/Traits/NoTimestamp',
             {updatedAt: true},
         );
       }
@@ -82,7 +80,7 @@ test.group('NoTimestamp', () => {
       static boot() {
         super.boot();
         this.addTrait(
-            NoTimestamp,
+            '@provider:Prk/Traits/NoTimestamp',
             {createdAt: true, updatedAt: true},
         );
       }
