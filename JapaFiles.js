@@ -13,7 +13,7 @@ const {database, redis, sqliteFilePath} = require('./test-config');
 
 configure({
   files: ['test/*.spec.js'],
-  bail: true,
+  bail: process.env.TEST_BAIL == null,
   before: [
     () => {
       // Resolver
@@ -56,7 +56,7 @@ configure({
       const Database = fold.ioc.use('Database');
       const Redis = fold.ioc.use('Redis');
       await Database.close();
-      await Redis.quit();
+      await Redis.quit(['local', 'anotherLocal']);
 
       if (fs.existsSync(sqliteFilePath)) {
         fs.unlinkSync(sqliteFilePath);
