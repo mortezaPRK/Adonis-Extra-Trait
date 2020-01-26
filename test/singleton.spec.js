@@ -49,8 +49,8 @@ test.group('Singleton', (group) => {
     );
 
     assert.isFunction(
-        User.getCurrent,
-        'getCurrent not registered!',
+        Object.getOwnPropertyDescriptor(User, 'current')['get'],
+        'current not registered!',
     );
 
     assert.isArray(
@@ -94,7 +94,7 @@ test.group('Singleton', (group) => {
         'last model should have id with value of 5',
     );
 
-    const byStaticMethod = await User.getCurrent();
+    const byStaticMethod = await User.current;
 
     assert.deepEqual(
         lastById,
@@ -132,7 +132,7 @@ test.group('Singleton', (group) => {
         'last model should have id with value of 5',
     );
 
-    const byStaticMethod = await Post.getCurrent();
+    const byStaticMethod = await Post.current;
 
     assert.deepEqual(
         lastByPK,

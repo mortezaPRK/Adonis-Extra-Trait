@@ -6,9 +6,9 @@ class Singleton {
       });
     }
     const pk = Model.primaryKey;
-    Model.getCurrent = async function() {
-      return Model.query().orderBy(pk, 'desc').first();
-    };
+    Object.defineProperty(Model, 'current', {
+      get: async () => Model.query().orderBy(pk, 'desc').first(),
+    });
     Object.defineProperty(Model, 'isSingleton', {
       get: () => true,
     });
