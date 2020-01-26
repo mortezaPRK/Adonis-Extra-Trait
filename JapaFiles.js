@@ -11,8 +11,16 @@ const TraitProvider = require('.');
 
 const {database, redis, sqliteFilePath} = require('./test-config');
 
+const testFiles = () => {
+  const envFiles = process.env.TEST_FILES;
+  if (envFiles == null) {
+    return ['test/*.spec.js'];
+  }
+  return envFiles.trim().split(',').map((i) => i.trim());
+};
+
 configure({
-  files: ['test/*.spec.js'],
+  files: testFiles(),
   bail: process.env.TEST_BAIL == null,
   before: [
     () => {
