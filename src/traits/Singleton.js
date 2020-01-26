@@ -8,7 +8,9 @@ class Singleton {
     Model.getCurrent = async function() {
       return Model.query().orderBy('id', 'desc').first();
     };
-    Model.isSingleton = true;
+    Object.defineProperty(Model, 'isSingleton', {
+      get: () => true,
+    });
   }
 }
 
