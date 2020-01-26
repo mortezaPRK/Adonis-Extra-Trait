@@ -36,10 +36,7 @@ configure({
     () => {
       const config = fold.ioc.use('Config');
       config.set('database', database);
-      config.set('redis', {
-        ...redis,
-        loadScript: ['local', 'anotherLocal'],
-      });
+      config.set('redis', {...redis, loadScript: ['local', 'anotherLocal']});
     },
     async () => {
       // Database

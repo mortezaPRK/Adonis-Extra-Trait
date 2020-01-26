@@ -12,6 +12,15 @@
         "sourceType": "module"
     },
     "rules": {
-        "require-jsdoc": "off"
+        "require-jsdoc": "off",
+        "max-len": [
+            "error",
+            120
+        ],
+        "space-in-parens": [
+            "error",
+            "never"
+        ],
+        "no-console": "warn"
     }
 }

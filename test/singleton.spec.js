@@ -106,9 +106,7 @@ test.group('Singleton', (group) => {
     class Post extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
       }
       static get primaryKey() {
         return 'pk';
@@ -146,9 +144,7 @@ test.group('Singleton', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
       }
     }
     User._bootIfNotBooted();
@@ -176,12 +172,7 @@ test.group('Singleton', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-            {
-              ignoreUpdate: true,
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton', {ignoreUpdate: true});
       }
     }
     User._bootIfNotBooted();

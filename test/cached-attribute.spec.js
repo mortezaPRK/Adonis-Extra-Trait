@@ -54,12 +54,7 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: 'f1',
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: 'f1'});
       }
     }
     let error;
@@ -85,12 +80,7 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: [],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: []});
       }
     }
     let error;
@@ -116,12 +106,7 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
     let error;
@@ -147,15 +132,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
+        this.addTrait('@provider:Prk/Traits/Singleton');
       }
     }
     let error;
@@ -181,15 +159,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
 
@@ -242,15 +213,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
     User._bootIfNotBooted();
@@ -298,15 +262,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
     User._bootIfNotBooted();
@@ -349,15 +306,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
     User._bootIfNotBooted();
@@ -410,15 +360,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
     User._bootIfNotBooted();
@@ -476,15 +419,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
     User._bootIfNotBooted();
@@ -520,15 +456,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
     User._bootIfNotBooted();
@@ -566,15 +495,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
     User._bootIfNotBooted();
@@ -628,15 +550,8 @@ test.group('CachedAttribute', (group) => {
     class Post extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
       static get primaryKey() {
         return 'pk';
@@ -682,15 +597,8 @@ test.group('CachedAttribute', (group) => {
     class Post extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
       static get primaryKey() {
         return 'pk';
@@ -746,15 +654,8 @@ test.group('CachedAttribute', (group) => {
     class Post extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
       static get primaryKey() {
         return 'pk';
@@ -815,15 +716,8 @@ test.group('CachedAttribute', (group) => {
     class Post extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
       static get primaryKey() {
         return 'pk';
@@ -862,15 +756,8 @@ test.group('CachedAttribute', (group) => {
     class Post extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
       static get primaryKey() {
         return 'pk';
@@ -911,15 +798,8 @@ test.group('CachedAttribute', (group) => {
     class Post extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
       static get primaryKey() {
         return 'pk';
@@ -976,16 +856,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-              redis: secondRedis,
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2'], redis: secondRedis});
       }
     }
     User._bootIfNotBooted();
@@ -1023,15 +895,8 @@ test.group('CachedAttribute', (group) => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
+        this.addTrait('@provider:Prk/Traits/Singleton');
+        this.addTrait('@provider:Prk/Traits/CachedAttribute', {fields: ['f1', 'f2']});
       }
     }
     User._bootIfNotBooted();

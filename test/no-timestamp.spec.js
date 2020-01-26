@@ -8,9 +8,7 @@ test.group('NoTimestamp', () => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/NoTimestamp',
-        );
+        this.addTrait('@provider:Prk/Traits/NoTimestamp');
       }
     }
     User._bootIfNotBooted();
@@ -31,10 +29,7 @@ test.group('NoTimestamp', () => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/NoTimestamp',
-            {createdAt: true},
-        );
+        this.addTrait('@provider:Prk/Traits/NoTimestamp', {createdAt: true});
       }
     }
     User._bootIfNotBooted();
@@ -55,10 +50,7 @@ test.group('NoTimestamp', () => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/NoTimestamp',
-            {updatedAt: true},
-        );
+        this.addTrait('@provider:Prk/Traits/NoTimestamp', {updatedAt: true});
       }
     }
     User._bootIfNotBooted();
@@ -79,10 +71,7 @@ test.group('NoTimestamp', () => {
     class User extends Model {
       static boot() {
         super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/NoTimestamp',
-            {createdAt: true, updatedAt: true},
-        );
+        this.addTrait('@provider:Prk/Traits/NoTimestamp', {createdAt: true, updatedAt: true});
       }
     }
     User._bootIfNotBooted();
