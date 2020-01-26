@@ -4,9 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint --quiet .",
+    "lint-all": "eslint .",
+    "test": "node JapaFiles.js",
+    "test-all": "TEST_BAIL=1 node JapaFiles.js",
+    "coverage": "nyc -s npm run --silent test-all",
+    "report": "nyc report"
   },
-  "author": "",
-  "license": "NAN",
+  "author": "Morteza Pourkazemi",
+  "license": "mit",
   "devDependencies": {
     "@adonisjs/fold": "^4.0.9",
     "@adonisjs/lucid": "^6.1.3",
