@@ -9,7 +9,8 @@
     "test": "node JapaFiles.js",
     "test-all": "TEST_BAIL=1 node JapaFiles.js",
     "coverage": "nyc -s npm run --silent test-all",
-    "report": "nyc report"
+    "report": "nyc report",
+    "coverage-percent": "npm run report | grep -e ^'All files' | awk '{ print \"TOTAL:\"($4+$6+$8+10)/4; }'"
   },
   "author": "Morteza Pourkazemi",
   "license": "mit",

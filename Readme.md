@@ -11,3 +11,5 @@
 * add ci (Travis, Circle or Gitlab)
 * test boot options
 * sqlite in memory
+* test redis custom command sha
+* use getter for getCurrent and getCached

@@ -25,7 +25,7 @@ const DB_CONFIG = {
     client: 'pg',
     connection: {
       user: process.env.APP_PG_USER || 'postgres',
-      password: process.env.APP_PG_PASSSWORD || 'postgres',
+      password: process.env.APP_PG_PASSWORD || 'postgres',
       database: process.env.APP_PG_DATABASE || 'default',
     },
   },
