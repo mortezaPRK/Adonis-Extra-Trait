@@ -7,6 +7,11 @@ const getFields = (instance, fields) => {
 };
 
 class CachedAttribute {
+  constructor(redisCommandHash, numOfKeys) {
+    this._hash = redisCommandHash;
+    this._numOfKeys = numOfKeys;
+  }
+
   register(Model, {fields, redis}) {
     if (!Array.isArray(fields) || fields.length === 0) {
       throw new Error(`${Model.name}: fields should be a non-empty array`);
@@ -21,10 +26,10 @@ class CachedAttribute {
     const name = `cached_attrs_${Model.name}`;
     const lockName = `${name}_lock`;
 
-    Model.addHook('afterCreate', async function(modelInstance) {
+    Model.addHook('afterCreate', async (modelInstance) => {
       await redis.evalsha(
-          'b02dd40a22f1e5e726ed5b6c7676f2803b7333fc',
-          4,
+          this._hash,
+          this._numOfKeys,
           lockName,
           modelInstance.primaryKeyValue,
           name,

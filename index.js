@@ -2,11 +2,14 @@ const {ServiceProvider} = require('@adonisjs/fold');
 
 // eslint-disable-next-line max-len
 const REDIS_COMMAND = 'if tonumber(redis.call(\'get\', KEYS[1]) or 0) < tonumber(KEYS[2]) then redis.call(\'set\', KEYS[1], KEYS[2]); redis.call(\'set\', KEYS[3], KEYS[4]) end';
+const REDIS_COMMAND_HASH = 'b02dd40a22f1e5e726ed5b6c7676f2803b7333fc';
+const REDIS_COMMAND_KEYS = 4;
 
 class TraitProvider extends ServiceProvider {
   register() {
     this.app.bind('Prk/Traits/CachedAttribute', () => {
-      return new (require('./src/traits/CachedAttribute'));
+      const CachedAttribute = require('./src/traits/CachedAttribute');
+      return new CachedAttribute(REDIS_COMMAND_HASH, REDIS_COMMAND_KEYS);
     });
     this.app.bind('Prk/Traits/NoTimestamp', () => {
       return new (require('./src/traits/NoTimestamp'));
@@ -18,6 +21,14 @@ class TraitProvider extends ServiceProvider {
     this.app.singleton('Prk/Helper/RedisCustomCommand', () => {
       return async (redisClient) => {
         await redisClient.script('load', REDIS_COMMAND);
+      };
+    });
+
+    this.app.singleton('Prk/Helper/RedisCustomCommandDetail', () => {
+      return {
+        command: REDIS_COMMAND,
+        hash: REDIS_COMMAND_HASH,
+        numOfKeys: REDIS_COMMAND_KEYS,
       };
     });
   }
