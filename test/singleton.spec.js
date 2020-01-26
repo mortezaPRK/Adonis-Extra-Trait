@@ -11,18 +11,24 @@ test.group('Singleton', (group) => {
       table.increments();
       table.timestamps();
     });
+    await Database.schema.createTable('posts', (table) => {
+      table.increments('pk');
+      table.timestamps();
+    });
     await Database.close();
   });
 
   group.afterEach(async () => {
     const Database = ioc.use('Database');
     await Database.table('users').truncate();
+    await Database.table('posts').truncate();
     await Database.close();
   });
 
   group.after(async () => {
     const Database = ioc.use('Database');
     await Database.schema.dropTable('users');
+    await Database.schema.dropTable('posts');
     await Database.close();
   });
 
@@ -92,6 +98,46 @@ test.group('Singleton', (group) => {
 
     assert.deepEqual(
         lastById,
+        byStaticMethod,
+    );
+  }).timeout(3000);
+
+  test('Get current by static method with non-default PK', async (assert) => {
+    class Post extends Model {
+      static boot() {
+        super.boot();
+        this.addTrait(
+            '@provider:Prk/Traits/Singleton',
+        );
+      }
+      static get primaryKey() {
+        return 'pk';
+      }
+    }
+    Post._bootIfNotBooted();
+
+    await Promise.all([...(new Array(5))].map(() => Post.create()));
+
+    const total = await Post.getCount();
+
+    assert.strictEqual(
+        +total,
+        5,
+        'there should be 5 models in DB',
+    );
+
+    const lastByPK = await Post.query().orderBy('pk', 'desc').first();
+
+    assert.strictEqual(
+        lastByPK.pk,
+        5,
+        'last model should have id with value of 5',
+    );
+
+    const byStaticMethod = await Post.getCurrent();
+
+    assert.deepEqual(
+        lastByPK,
         byStaticMethod,
     );
   }).timeout(3000);

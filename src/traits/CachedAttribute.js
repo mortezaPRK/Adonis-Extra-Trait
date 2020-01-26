@@ -26,7 +26,7 @@ class CachedAttribute {
           'b02dd40a22f1e5e726ed5b6c7676f2803b7333fc',
           4,
           lockName,
-          modelInstance.id,
+          modelInstance.primaryKeyValue,
           name,
           JSON.stringify(getFields(modelInstance.$attributes, fields)),
       );
@@ -39,7 +39,7 @@ class CachedAttribute {
       }
       const attrs = getFields(current.$attributes, fields);
       await redis.set(name, JSON.stringify(attrs));
-      await redis.set(lockName, current.id.toString());
+      await redis.set(lockName, current.primaryKeyValue.toString());
       return attrs;
     };
 
