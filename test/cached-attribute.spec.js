@@ -3,6 +3,22 @@ const {ioc} = require('@adonisjs/fold');
 
 const Model = ioc.use('Model');
 
+const sequence = (max, random) => {
+  let i = 1;
+  const values = [...new Array(max)].map(() => i++).map((j) => [j, j.toString()]);
+  if (!random) {
+    return values;
+  }
+
+  const randomValues = [];
+  let length = max;
+  [...new Array(max)].forEach(() => {
+    randomValues.push(values.splice(Math.floor(Math.random() * length), 1)[0]);
+    length--;
+  });
+  return randomValues;
+};
+
 test.group('CachedAttribute', (group) => {
   group.before(async () => {
     const Database = ioc.use('Database');
@@ -48,6 +64,201 @@ test.group('CachedAttribute', (group) => {
     await Database.schema.dropTable('users');
     await Database.schema.dropTable('posts');
     await Database.close();
+  });
+
+  test('Redis custom command SHA', async (assert) => {
+    const Redis = ioc.use('Redis');
+    const {command, hash} = ioc.use('Prk/Helper/RedisCustomCommandDetail');
+    const commandHash = await Redis.script('load', command);
+
+    assert.strictEqual(
+        commandHash,
+        hash,
+        'hash for redis command is incorrect',
+    );
+  });
+
+  test('Redis custom command', async (assert) => {
+    const Redis = ioc.use('Redis');
+    const {command, hash, numOfKeys} = ioc.use('Prk/Helper/RedisCustomCommandDetail');
+
+    await Redis.script('load', command);
+
+    const lockName = 'lorem';
+    const cacheName = 'ipsum';
+    const lockValue = 10;
+    const cacheValue = {
+      a: 1,
+      b: 'b',
+      c: true,
+      d: [1, 'b', false, []],
+      e: {
+        a: 1,
+        b: 'b',
+        c: true,
+        d: [1, 'b', false, []],
+        e: {},
+      },
+    };
+
+    await Promise.all([
+      Redis.del(cacheName),
+      Redis.del(lockName),
+    ]);
+
+    await Redis.evalsha(hash, numOfKeys, lockName, lockValue, cacheName, JSON.stringify(cacheValue));
+
+    const redisValueRaw = await Redis.get(cacheName);
+
+    assert.deepEqual(
+        JSON.parse(redisValueRaw),
+        cacheValue,
+        'cache value not saved correctly',
+    );
+    const redisLockValue = await Redis.get(lockName);
+
+    assert.strictEqual(
+        +redisLockValue,
+        lockValue,
+        'cache value not saved correctly',
+    );
+  });
+
+  test('Redis custom command logic for lock', async (assert) => {
+    const Redis = ioc.use('Redis');
+    const {command, hash, numOfKeys} = ioc.use('Prk/Helper/RedisCustomCommandDetail');
+
+    await Redis.script('load', command);
+
+    const lockName = 'lorem';
+    const cacheName = 'ipsum';
+
+    await Promise.all([
+      Redis.del(cacheName),
+      Redis.del(lockName),
+    ]);
+
+    const save = async (lockValue, cacheValue) => Redis.evalsha(
+        hash,
+        numOfKeys,
+        lockName,
+        lockValue,
+        cacheName,
+        cacheValue,
+    );
+
+    const redisLockValue = async () => Redis.get(lockName);
+    const redisCacheValue = async () => Redis.get(cacheName);
+
+    /**
+     * Saving when empty
+     */
+    await save(5, '5');
+    assert.strictEqual(
+        +(await redisLockValue()),
+        5,
+        'lock value not saved',
+    );
+    assert.strictEqual(
+        await redisCacheValue(),
+        '5',
+        'cache value not saved',
+    );
+
+    /**
+     * Saving with lower lock
+     */
+    await save(4, '4');
+    assert.strictEqual(
+        +(await redisLockValue()),
+        5,
+        'lock value changed when older one was greater!',
+    );
+    assert.strictEqual(
+        await redisCacheValue(),
+        '5',
+        'cache value not saved while lock value is not',
+    );
+
+    /**
+     * Saving with higher lock
+     */
+    await save(6, '6');
+    assert.strictEqual(
+        +(await redisLockValue()),
+        6,
+        'lock value not updated with higher value',
+    );
+    assert.strictEqual(
+        await redisCacheValue(),
+        '6',
+        'cache value not saved while lock value updated!',
+    );
+  });
+
+  test('Redis custom command concurrency', async (assert) => {
+    const Redis = ioc.use('Redis');
+    const {command, hash, numOfKeys} = ioc.use('Prk/Helper/RedisCustomCommandDetail');
+
+    await Redis.script('load', command);
+
+    const lockName = 'lorem';
+    const cacheName = 'ipsum';
+
+    const save = async (lockValue, cacheValue) => Redis.evalsha(
+        hash,
+        numOfKeys,
+        lockName,
+        lockValue,
+        cacheName,
+        cacheValue,
+    );
+
+    const redisLockValue = async () => Redis.get(lockName);
+    const redisCacheValue = async () => Redis.get(cacheName);
+
+    /**
+     * Run 5, 10, 30, 60, 100 concurrent redis command
+     * with values in a sequence (1,2,3,....)
+     */
+    for (const num of [5, 10, 30, 60, 100]) {
+      await Promise.all([Redis.del(cacheName), Redis.del(lockName)]);
+      const values = sequence(num);
+      await Promise.all(values.map((i) => save(...i)));
+
+      assert.strictEqual(
+          +(await redisLockValue()),
+          num,
+          `expected lock to be ${num} in sequence of ${num}`,
+      );
+      assert.strictEqual(
+          await redisCacheValue(),
+          num.toString(),
+          `value saved incorrectly for sequence of ${num}`,
+      );
+    }
+
+    /**
+     * Run 5, 10, 30, 60, 100 concurrent redis command
+     * with values in a random sequence (12,7,2,66,....)
+     */
+    for (const num of [5, 10, 30, 60, 100]) {
+      await Promise.all([Redis.del(cacheName), Redis.del(lockName)]);
+      const values = sequence(num, true);
+      await Promise.all(values.map((i) => save(...i)));
+
+      assert.strictEqual(
+          +(await redisLockValue()),
+          num,
+          `expected lock to be ${num} in random sequence of ${num}`,
+      );
+
+      assert.strictEqual(
+          await redisCacheValue(),
+          num.toString(),
+          `value saved incorrectly for random sequence of ${num}`,
+      );
+    }
   });
 
   test('Fail with non array field', async (assert) => {
@@ -312,7 +523,7 @@ test.group('CachedAttribute', (group) => {
     }
     User._bootIfNotBooted();
     let i = 0;
-    const users = [...new Array(100)].map(() => {
+    const users = [...new Array(10)].map(() => {
       i++;
       return {
         f1: i,
@@ -324,8 +535,8 @@ test.group('CachedAttribute', (group) => {
     await Promise.all(users.map((d) => User.create(d)));
 
     const lastSaveValues = {
-      f1: 100,
-      f2: '200',
+      f1: 10,
+      f2: '20',
     };
 
     const lastById = await User.query().orderBy('id', 'desc').first();
@@ -606,7 +817,7 @@ test.group('CachedAttribute', (group) => {
     }
     Post._bootIfNotBooted();
     let i = 0;
-    const posts = [...new Array(100)].map(() => {
+    const posts = [...new Array(10)].map(() => {
       i++;
       return {
         f1: i,
@@ -618,8 +829,8 @@ test.group('CachedAttribute', (group) => {
     await Promise.all(posts.map((d) => Post.create(d)));
 
     const lastSaveValues = {
-      f1: 100,
-      f2: '200',
+      f1: 10,
+      f2: '20',
     };
 
     const lastByPK = await Post.query().orderBy('pk', 'desc').first();
