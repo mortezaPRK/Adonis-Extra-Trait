@@ -13,12 +13,20 @@ test.group('CachedAttribute', (group) => {
       table.bool('f3').notNullable();
       table.timestamps();
     });
+    await Database.schema.createTable('posts', (table) => {
+      table.increments('pk');
+      table.integer('f1').notNullable();
+      table.string('f2').notNullable();
+      table.bool('f3').notNullable();
+      table.timestamps();
+    });
     await Database.close();
   });
 
   group.afterEach(async () => {
     const Database = ioc.use('Database');
     await Database.table('users').truncate();
+    await Database.table('posts').truncate();
     await Database.close();
 
     const Redis = ioc.use('Redis');
@@ -27,6 +35,10 @@ test.group('CachedAttribute', (group) => {
       Redis.del('cached_attrs_User_lock'),
       Redis.connection('anotherLocal').del('cached_attrs_User'),
       Redis.connection('anotherLocal').del('cached_attrs_User_lock'),
+      Redis.del('cached_attrs_Post'),
+      Redis.del('cached_attrs_Post_lock'),
+      Redis.connection('anotherLocal').del('cached_attrs_Post'),
+      Redis.connection('anotherLocal').del('cached_attrs_Post_lock'),
     ]);
     await Redis.quit(['local', 'anotherLocal']);
   });
@@ -34,6 +46,7 @@ test.group('CachedAttribute', (group) => {
   group.after(async () => {
     const Database = ioc.use('Database');
     await Database.schema.dropTable('users');
+    await Database.schema.dropTable('posts');
     await Database.close();
   });
 
@@ -391,68 +404,6 @@ test.group('CachedAttribute', (group) => {
     );
   }).timeout(0);
 
-  test('Warm up', async (assert) => {
-    const Redis = ioc.use('Redis');
-
-    class User extends Model {
-      static boot() {
-        super.boot();
-        this.addTrait(
-            '@provider:Prk/Traits/Singleton',
-        );
-        this.addTrait(
-            '@provider:Prk/Traits/CachedAttribute',
-            {
-              fields: ['f1', 'f2'],
-            },
-        );
-      }
-    }
-    User._bootIfNotBooted();
-    const attrs = {
-      f1: 128,
-      f2: 'lorem ipsum',
-      f3: false,
-    };
-    const user = await User.create(attrs);
-
-    const cachedAttrs = {
-      f1: attrs.f1,
-      f2: attrs.f2,
-    };
-
-    await Redis.del(User.cachedName);
-
-    assert.isNull(
-        await Redis.get(User.cachedName),
-        'Redis values should be null after deleting',
-    );
-
-    const warmUpValue = await User.warmUp();
-
-    assert.deepEqual(
-        cachedAttrs,
-        warmUpValue,
-        'warmUp returns wrong value',
-    );
-
-    const redisValue = await Redis.get(User.cachedName);
-
-    const redisValueParsed = JSON.parse(redisValue);
-
-    assert.deepEqual(
-        redisValueParsed,
-        cachedAttrs,
-        'warmUp saved incorrect values',
-    );
-
-    assert.deepEqual(
-        await Redis.get(`${User.cachedName}_lock`),
-        user.id.toString(),
-        'warm up saved incorrect lock value',
-    );
-  });
-
   test('Get cached with redis value', async (assert) => {
     const Redis = ioc.use('Redis');
 
@@ -667,6 +618,354 @@ test.group('CachedAttribute', (group) => {
     assert.deepEqual(
         await Redis.get(`${User.cachedName}_lock`),
         user.id.toString(),
+        'warm up saved incorrect lock value',
+    );
+  });
+
+  test('Hook for afterCreate (non-default PK)', async (assert) => {
+    const Redis = ioc.use('Redis');
+
+    class Post extends Model {
+      static boot() {
+        super.boot();
+        this.addTrait(
+            '@provider:Prk/Traits/Singleton',
+        );
+        this.addTrait(
+            '@provider:Prk/Traits/CachedAttribute',
+            {
+              fields: ['f1', 'f2'],
+            },
+        );
+      }
+      static get primaryKey() {
+        return 'pk';
+      }
+    }
+    Post._bootIfNotBooted();
+
+    const attrs = {
+      f1: 128,
+      f2: 'lorem ipsum',
+      f3: false,
+    };
+    const post = await Post.create(attrs);
+
+    const redisValue = await Redis.get(Post.cachedName);
+    const redisLockValue = await Redis.get(`${Post.cachedName}_lock`);
+
+    assert.strictEqual(
+        post.pk,
+        +redisLockValue,
+        'lock value is incorrect',
+    );
+    let redisValueParsed;
+    try {
+      redisValueParsed = JSON.parse(redisValue);
+    } catch (e) {
+      assert.fail(`wrong value set in Redis ${redisValue} (${e.message})`);
+    }
+
+    assert.deepEqual(
+        {
+          f1: attrs.f1,
+          f2: attrs.f2,
+        },
+        redisValueParsed,
+        `Serializations error`,
+    );
+  });
+
+  test('Race Condition (non-default PK)', async (assert) => {
+    const Redis = ioc.use('Redis');
+
+    class Post extends Model {
+      static boot() {
+        super.boot();
+        this.addTrait(
+            '@provider:Prk/Traits/Singleton',
+        );
+        this.addTrait(
+            '@provider:Prk/Traits/CachedAttribute',
+            {
+              fields: ['f1', 'f2'],
+            },
+        );
+      }
+      static get primaryKey() {
+        return 'pk';
+      }
+    }
+    Post._bootIfNotBooted();
+    let i = 0;
+    const posts = [...new Array(100)].map(() => {
+      i++;
+      return {
+        f1: i,
+        f2: (i * 2).toString(),
+        f3: i % 2 === 0,
+      };
+    });
+
+    await Promise.all(posts.map((d) => Post.create(d)));
+
+    const lastSaveValues = {
+      f1: 100,
+      f2: '200',
+    };
+
+    const lastByPK = await Post.query().orderBy('pk', 'desc').first();
+    const redisValue = await Redis.get(Post.cachedName);
+
+    let redisValueParsed;
+    try {
+      redisValueParsed = JSON.parse(redisValue);
+    } catch (e) {
+      assert.fail(`value set incorrectly: (${redisValue}) -> ${e.message}`);
+    }
+
+    assert.deepEqual(
+        {
+          f1: lastByPK.f1,
+          f2: lastByPK.f2,
+        },
+        redisValueParsed,
+        'Redis values differs from DB',
+    );
+
+    assert.deepEqual(
+        lastSaveValues,
+        redisValueParsed,
+        'Redis values differs from last saved values',
+    );
+  }).timeout(0);
+
+  test('Get cached with redis value (non-default PK)', async (assert) => {
+    const Redis = ioc.use('Redis');
+
+    class Post extends Model {
+      static boot() {
+        super.boot();
+        this.addTrait(
+            '@provider:Prk/Traits/Singleton',
+        );
+        this.addTrait(
+            '@provider:Prk/Traits/CachedAttribute',
+            {
+              fields: ['f1', 'f2'],
+            },
+        );
+      }
+      static get primaryKey() {
+        return 'pk';
+      }
+    }
+    Post._bootIfNotBooted();
+    const attrs = {
+      f1: 128,
+      f2: 'lorem ipsum',
+      f3: false,
+    };
+    await Post.create(attrs);
+
+    const redisValue = await Redis.get(Post.cachedName);
+
+    const redisValueParsed = JSON.parse(redisValue);
+
+    const byStaticMethod = await Post.getCached();
+
+    assert.deepEqual(
+        byStaticMethod,
+        redisValueParsed,
+        `getCached returned wrong values`,
+    );
+
+    await Redis.del(Post.cachedName);
+
+    assert.isNull(
+        await Redis.get(Post.cachedName),
+        'Redis values should be null after deleting',
+    );
+
+    await Post.warmUp();
+
+    assert.deepEqual(
+        redisValueParsed,
+        await Post.getCached(),
+        'getCached returns wrong values when warmed up',
+    );
+
+    await Redis.del(Post.cachedName);
+
+    assert.isNull(
+        await Redis.get(Post.cachedName),
+        'Redis values should be null after deleting',
+    );
+
+    assert.deepEqual(
+        redisValueParsed,
+        await Post.getCached(),
+        'getCached returns wrong values when redis is empty',
+    );
+  });
+
+  test('Get cached without redis value (non-default PK)', async (assert) => {
+    const Redis = ioc.use('Redis');
+
+    class Post extends Model {
+      static boot() {
+        super.boot();
+        this.addTrait(
+            '@provider:Prk/Traits/Singleton',
+        );
+        this.addTrait(
+            '@provider:Prk/Traits/CachedAttribute',
+            {
+              fields: ['f1', 'f2'],
+            },
+        );
+      }
+      static get primaryKey() {
+        return 'pk';
+      }
+    }
+    Post._bootIfNotBooted();
+    const attrs = {
+      f1: 128,
+      f2: 'lorem ipsum',
+      f3: false,
+    };
+    await Post.create(attrs);
+
+    const cachedAttrs = {
+      f1: attrs.f1,
+      f2: attrs.f2,
+    };
+
+    await Redis.del(Post.cachedName);
+
+    assert.isNull(
+        await Redis.get(Post.cachedName),
+        'Redis values should be null after deleting',
+    );
+
+    assert.deepEqual(
+        cachedAttrs,
+        await Post.getCached(),
+        'getCached returns wrong values when warmed up',
+    );
+  });
+
+  test('Get cached without redis value (warmed up) (non-default PK)', async (assert) => {
+    const Redis = ioc.use('Redis');
+
+    class Post extends Model {
+      static boot() {
+        super.boot();
+        this.addTrait(
+            '@provider:Prk/Traits/Singleton',
+        );
+        this.addTrait(
+            '@provider:Prk/Traits/CachedAttribute',
+            {
+              fields: ['f1', 'f2'],
+            },
+        );
+      }
+      static get primaryKey() {
+        return 'pk';
+      }
+    }
+    Post._bootIfNotBooted();
+    const attrs = {
+      f1: 128,
+      f2: 'lorem ipsum',
+      f3: false,
+    };
+    await Post.create(attrs);
+
+    const cachedAttrs = {
+      f1: attrs.f1,
+      f2: attrs.f2,
+    };
+
+    await Redis.del(Post.cachedName);
+
+    assert.isNull(
+        await Redis.get(Post.cachedName),
+        'Redis values should be null after deleting',
+    );
+
+    await Post.warmUp();
+
+    assert.deepEqual(
+        cachedAttrs,
+        await Post.getCached(),
+        'getCached returns wrong values when warmed up',
+    );
+  });
+
+  test('Warm up (non-default PK)', async (assert) => {
+    const Redis = ioc.use('Redis');
+
+    class Post extends Model {
+      static boot() {
+        super.boot();
+        this.addTrait(
+            '@provider:Prk/Traits/Singleton',
+        );
+        this.addTrait(
+            '@provider:Prk/Traits/CachedAttribute',
+            {
+              fields: ['f1', 'f2'],
+            },
+        );
+      }
+      static get primaryKey() {
+        return 'pk';
+      }
+    }
+    Post._bootIfNotBooted();
+    const attrs = {
+      f1: 128,
+      f2: 'lorem ipsum',
+      f3: false,
+    };
+    const post = await Post.create(attrs);
+
+    const cachedAttrs = {
+      f1: attrs.f1,
+      f2: attrs.f2,
+    };
+
+    await Redis.del(Post.cachedName);
+
+    assert.isNull(
+        await Redis.get(Post.cachedName),
+        'Redis values should be null after deleting',
+    );
+
+    const warmUpValue = await Post.warmUp();
+
+    assert.deepEqual(
+        cachedAttrs,
+        warmUpValue,
+        'warmUp returns wrong value',
+    );
+
+    const redisValue = await Redis.get(Post.cachedName);
+
+    const redisValueParsed = JSON.parse(redisValue);
+
+    assert.deepEqual(
+        redisValueParsed,
+        cachedAttrs,
+        'warmUp saved incorrect values',
+    );
+
+    assert.deepEqual(
+        await Redis.get(`${Post.cachedName}_lock`),
+        post.pk.toString(),
         'warm up saved incorrect lock value',
     );
   });
