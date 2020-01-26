@@ -24,6 +24,15 @@ configure({
   bail: process.env.TEST_BAIL == null,
   before: [
     () => {
+      if (fs.existsSync(sqliteFilePath)) {
+        fs.unlinkSync(sqliteFilePath);
+      }
+      const journal = `${sqliteFilePath}-journal`;
+      if (fs.existsSync(journal)) {
+        fs.unlinkSync(journal);
+      }
+    },
+    () => {
       // Resolver
       iocResolver.setFold(fold);
       setupResolver();
