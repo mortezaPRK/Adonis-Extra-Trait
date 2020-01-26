@@ -193,13 +193,13 @@ test.group('CachedAttribute', (group) => {
     );
 
     assert.isFunction(
-        User.warmUp,
+        Object.getOwnPropertyDescriptor(User, 'warmUp')['get'],
         'warmUp not registered!',
     );
 
     assert.isFunction(
-        User.getCached,
-        'getCached not registered!',
+        Object.getOwnPropertyDescriptor(User, 'cached')['get'],
+        'cached not registered!',
     );
 
     assert.strictEqual(
@@ -221,7 +221,7 @@ test.group('CachedAttribute', (group) => {
 
     let error;
     try {
-      await User.warmUp();
+      await User.warmUp;
     } catch (e) {
       error = e;
     }
@@ -239,7 +239,7 @@ test.group('CachedAttribute', (group) => {
 
     error = null;
     try {
-      await User.getCached();
+      await User.cached;
     } catch (e) {
       error = e;
     }
@@ -247,7 +247,7 @@ test.group('CachedAttribute', (group) => {
     assert.instanceOf(
         error,
         Error,
-        'expected getCached to error if Database is empty',
+        'expected cached to error if Database is empty',
     );
     assert.match(
         error.message,
@@ -376,12 +376,12 @@ test.group('CachedAttribute', (group) => {
 
     const redisValueParsed = JSON.parse(redisValue);
 
-    const byStaticMethod = await User.getCached();
+    const byStaticMethod = await User.cached;
 
     assert.deepEqual(
         byStaticMethod,
         redisValueParsed,
-        `getCached returned wrong values`,
+        `cached returned wrong values`,
     );
 
     await Redis.del(User.cachedName);
@@ -391,12 +391,12 @@ test.group('CachedAttribute', (group) => {
         'Redis values should be null after deleting',
     );
 
-    await User.warmUp();
+    await User.warmUp;
 
     assert.deepEqual(
         redisValueParsed,
-        await User.getCached(),
-        'getCached returns wrong values when warmed up',
+        await User.cached,
+        'cached returns wrong values when warmed up',
     );
 
     await Redis.del(User.cachedName);
@@ -408,8 +408,8 @@ test.group('CachedAttribute', (group) => {
 
     assert.deepEqual(
         redisValueParsed,
-        await User.getCached(),
-        'getCached returns wrong values when redis is empty',
+        await User.cached,
+        'cached returns wrong values when redis is empty',
     );
   });
 
@@ -445,8 +445,8 @@ test.group('CachedAttribute', (group) => {
 
     assert.deepEqual(
         cachedAttrs,
-        await User.getCached(),
-        'getCached returns wrong values when warmed up',
+        await User.cached,
+        'cached returns wrong values when warmed up',
     );
   });
 
@@ -480,12 +480,12 @@ test.group('CachedAttribute', (group) => {
         'Redis values should be null after deleting',
     );
 
-    await User.warmUp();
+    await User.warmUp;
 
     assert.deepEqual(
         cachedAttrs,
-        await User.getCached(),
-        'getCached returns wrong values when warmed up',
+        await User.cached,
+        'cached returns wrong values when warmed up',
     );
   });
 
@@ -519,7 +519,7 @@ test.group('CachedAttribute', (group) => {
         'Redis values should be null after deleting',
     );
 
-    const warmUpValue = await User.warmUp();
+    const warmUpValue = await User.warmUp;
 
     assert.deepEqual(
         cachedAttrs,
@@ -673,12 +673,12 @@ test.group('CachedAttribute', (group) => {
 
     const redisValueParsed = JSON.parse(redisValue);
 
-    const byStaticMethod = await Post.getCached();
+    const byStaticMethod = await Post.cached;
 
     assert.deepEqual(
         byStaticMethod,
         redisValueParsed,
-        `getCached returned wrong values`,
+        `cached returned wrong values`,
     );
 
     await Redis.del(Post.cachedName);
@@ -688,12 +688,12 @@ test.group('CachedAttribute', (group) => {
         'Redis values should be null after deleting',
     );
 
-    await Post.warmUp();
+    await Post.warmUp;
 
     assert.deepEqual(
         redisValueParsed,
-        await Post.getCached(),
-        'getCached returns wrong values when warmed up',
+        await Post.cached,
+        'cached returns wrong values when warmed up',
     );
 
     await Redis.del(Post.cachedName);
@@ -705,8 +705,8 @@ test.group('CachedAttribute', (group) => {
 
     assert.deepEqual(
         redisValueParsed,
-        await Post.getCached(),
-        'getCached returns wrong values when redis is empty',
+        await Post.cached,
+        'cached returns wrong values when redis is empty',
     );
   });
 
@@ -745,8 +745,8 @@ test.group('CachedAttribute', (group) => {
 
     assert.deepEqual(
         cachedAttrs,
-        await Post.getCached(),
-        'getCached returns wrong values when warmed up',
+        await Post.cached,
+        'cached returns wrong values when warmed up',
     );
   });
 
@@ -783,12 +783,12 @@ test.group('CachedAttribute', (group) => {
         'Redis values should be null after deleting',
     );
 
-    await Post.warmUp();
+    await Post.warmUp;
 
     assert.deepEqual(
         cachedAttrs,
-        await Post.getCached(),
-        'getCached returns wrong values when warmed up',
+        await Post.cached,
+        'cached returns wrong values when warmed up',
     );
   });
 
@@ -825,7 +825,7 @@ test.group('CachedAttribute', (group) => {
         'Redis values should be null after deleting',
     );
 
-    const warmUpValue = await Post.warmUp();
+    const warmUpValue = await Post.warmUp;
 
     assert.deepEqual(
         cachedAttrs,

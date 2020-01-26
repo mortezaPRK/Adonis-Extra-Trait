@@ -32,26 +32,32 @@ class CachedAttribute {
       );
     });
 
-    Model.warmUp = async function() {
-      const current = await Model.getCurrent();
-      if (!current) {
-        throw new Error(`${Model.name}: nothing to get`);
-      }
-      const attrs = getFields(current.$attributes, fields);
-      await redis.set(name, JSON.stringify(attrs));
-      await redis.set(lockName, current.primaryKeyValue.toString());
-      return attrs;
-    };
-
-    Model.getCached = async function() {
-      const redisValue = await redis.get(name);
-      if (redisValue == null) {
-        return Model.warmUp();
-      }
-      return JSON.parse(redisValue);
-    };
-
-    Model.cachedName = name;
+    Object.defineProperties(Model, {
+      warmUp: {
+        get: async () => {
+          const current = await Model.current;
+          if (!current) {
+            throw new Error(`${Model.name}: nothing to get`);
+          }
+          const attrs = getFields(current.$attributes, fields);
+          await redis.set(name, JSON.stringify(attrs));
+          await redis.set(lockName, current.primaryKeyValue.toString());
+          return attrs;
+        },
+      },
+      cached: {
+        get: async () => {
+          const redisValue = await redis.get(name);
+          if (redisValue == null) {
+            return Model.warmUp;
+          }
+          return JSON.parse(redisValue);
+        },
+      },
+      cachedName: {
+        get: () => name,
+      },
+    });
   }
 }
 
