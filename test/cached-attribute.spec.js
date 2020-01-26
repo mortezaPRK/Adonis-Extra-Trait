@@ -522,21 +522,13 @@ test.group('CachedAttribute', (group) => {
       }
     }
     User._bootIfNotBooted();
-    let i = 0;
-    const users = [...new Array(10)].map(() => {
-      i++;
-      return {
-        f1: i,
-        f2: (i * 2).toString(),
-        f3: i % 2 === 0,
-      };
-    });
+    const users = sequence(10).map(([i, j]) => ({f1: i, f2: j, f3: i % 2 === true}));
 
     await Promise.all(users.map((d) => User.create(d)));
 
     const lastSaveValues = {
       f1: 10,
-      f2: '20',
+      f2: '10',
     };
 
     const lastById = await User.query().orderBy('id', 'desc').first();
@@ -816,21 +808,13 @@ test.group('CachedAttribute', (group) => {
       }
     }
     Post._bootIfNotBooted();
-    let i = 0;
-    const posts = [...new Array(10)].map(() => {
-      i++;
-      return {
-        f1: i,
-        f2: (i * 2).toString(),
-        f3: i % 2 === 0,
-      };
-    });
+    const posts = sequence(10).map(([i, j]) => ({f1: i, f2: j, f3: i%2 === 0}));
 
     await Promise.all(posts.map((d) => Post.create(d)));
 
     const lastSaveValues = {
       f1: 10,
-      f2: '20',
+      f2: '10',
     };
 
     const lastByPK = await Post.query().orderBy('pk', 'desc').first();
