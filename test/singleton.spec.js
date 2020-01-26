@@ -125,4 +125,25 @@ test.group('Singleton', (group) => {
         `Unknown error was thrown!`,
     );
   });
+
+  test('Success on update when `ignoreUpdate`', async (assert) => {
+    class User extends Model {
+      static boot() {
+        super.boot();
+        this.addTrait(
+            '@provider:Prk/Traits/Singleton',
+            {
+              ignoreUpdate: true,
+            },
+        );
+      }
+    }
+    User._bootIfNotBooted();
+    const user = await User.create();
+    try {
+      await user.save();
+    } catch (e) {
+      assert.fail(`Updating failed with 'ignoreUpdate': ${e.message}`);
+    }
+  });
 });
