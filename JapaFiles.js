@@ -9,7 +9,7 @@ const LucidProvider = require('@adonisjs/lucid/providers/LucidProvider');
 const RedisProvider = require('@adonisjs/redis/providers/RedisProvider');
 const TraitProvider = require('.');
 
-const {database, redis, sqliteFilePath} = require('./test-config');
+const {database, redis, sqliteFilePath} = require('./test/_utils');
 const sqliteJournalFilePath = `${sqliteFilePath}-journal`;
 
 const testFiles = () => {
