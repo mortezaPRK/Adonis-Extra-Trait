@@ -1,53 +1,103 @@
+const fs = require('fs');
 const path = require('path');
 
-let SQLITE = (process.env.SQLITE_DB_PATH || ':memory:').trim();
+/**
+ *
+ * Reads a value from env, with prefixed `APP_` to avoid
+ *  any possible conflict with other env vars
+ *
+ * @param {string} envName
+ * @param {string} defaultValue
+ * @return {string}
+ */
+const e = (envName, defaultValue) => (process.env[`APP_${envName}`] || defaultValue).trim();
 
-if (SQLITE !== ':memory:') {
-  if (!SQLITE.startsWith('/')) {
-    SQLITE = path.join(__dirname, SQLITE);
+/**
+ * Remove a file by full path, whether file exists or not
+ * @param {string} fileName
+ * @return {Promise<void>}
+ */
+const removeTempFile = (fileName) => new Promise((resolve) => fs.unlink(fileName, () => resolve()));
+
+/**
+ * Configuration object for Sqlite
+ * @property {object} connectionConfig - connection config for knex
+ * @property {string|null} journalPath - path of sqlite journal
+ * @property {bool} inMemory - whether sqlite is in memory or disk
+ */
+const {connectionConfig, journalPath, inMemory} = (() => {
+  let connectionConfig = e('SQLITE_DB_PATH', ':memory:');
+  const inMemory = connectionConfig === ':memory:';
+
+  let journalPath;
+
+  if (!inMemory) {
+    if (!connectionConfig.startsWith('/')) {
+      connectionConfig = path.join(__dirname, connectionConfig);
+    }
+    journalPath = connectionConfig + '-journal';
+    connectionConfig = {filename: connectionConfig};
   }
-  SQLITE = {filename: SQLITE};
-}
+  return {
+    connectionConfig,
+    journalPath,
+    inMemory,
+  };
+})();
 
+/**
+ * Generated list of file path to included to test
+ */
+const testFiles = (() => {
+  const envFiles = process.env.TEST_FILES;
+  if (envFiles == null) {
+    return ['test/*.spec.js'];
+  }
+  return envFiles.trim().split(',').map((i) => i.trim());
+})();
+
+/**
+ * same as 'Adonis' config/database.js file
+ */
 const DB_CONFIG = {
-  connection: process.env.APP_DB || 'sqlite3',
+  connection: e('DB', 'sqlite3'),
 
-  sqlite3: {
-    client: 'sqlite3',
-    connection: SQLITE,
-  },
+  sqlite3: {client: 'sqlite3', connection: connectionConfig},
 
   mysql: {
     client: 'mysql',
     connection: {
-      user: process.env.APP_MYSQL_USER || 'root',
-      password: process.env.APP_MYSQL_PASSWORD || 'root',
-      database: process.env.APP_MYSQL_DATABASE || 'default',
+      user: e('MYSQL_USER', 'root'),
+      password: e('MYSQL_PASSWORD', 'root'),
+      database: e('MYSQL_DATABASE', 'default'),
     },
   },
 
   pg: {
     client: 'pg',
     connection: {
-      user: process.env.APP_PG_USER || 'postgres',
-      password: process.env.APP_PG_PASSWORD || 'postgres',
-      database: process.env.APP_PG_DATABASE || 'default',
+      user: e('PG_USER', 'postgres'),
+      password: e('PG_PASSWORD', 'postgres'),
+      database: e('PG_DATABASE', 'default'),
     },
   },
 };
 
+/**
+ * same as 'Adonis' config/redis.js file
+ */
 const REDIS_CONFIG = {
   connection: 'local',
   local: {
-    host: process.env.APP_REDIS_HOST || 'redis',
-    port: process.env.APP_REDIS_PORT || '6379',
+    host: e('REDIS_HOST', 'redis'),
+    port: e('REDIS_PORT', '6379'),
     password: null,
     db: 0,
     keyPrefix: '',
   },
   anotherLocal: {
-    host: process.env.APP_REDIS_HOST || 'redis2',
-    port: process.env.APP_REDIS_PORT || '6379',
+    host: e('REDIS_HOST', 'redis2'),
+    port: e('REDIS_PORT', '6379'),
     password: null,
     db: 0,
     keyPrefix: '',
@@ -56,7 +106,14 @@ const REDIS_CONFIG = {
 
 
 module.exports = {
-  redis: REDIS_CONFIG,
-  database: DB_CONFIG,
-  sqliteFilePath: SQLITE,
+  redisConfig: REDIS_CONFIG,
+  databaseConfig: DB_CONFIG,
+  sqliteConfig: {
+    inMemory,
+    journalPath,
+    filePath: inMemory ? null : connectionConfig.filename,
+  },
+  redisConnectionNames: Object.keys(REDIS_CONFIG).filter((i) => i !== 'connection'),
+  testFiles,
+  removeTempFile,
 };
