@@ -8,7 +8,6 @@ if (SQLITE !== ':memory:') {
   }
   SQLITE = {filename: SQLITE};
 }
-// const SQLITE_DB_PATH = path.join(__dirname, 'test.sqlite3');
 
 const DB_CONFIG = {
   connection: process.env.APP_DB || 'sqlite3',
@@ -16,10 +15,6 @@ const DB_CONFIG = {
   sqlite3: {
     client: 'sqlite3',
     connection: SQLITE,
-    // connection: {
-    //   filename: SQLITE_DB_PATH,
-    // },
-    // connection: ':memory:',
   },
 
   mysql: {
