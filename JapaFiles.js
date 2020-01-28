@@ -1,4 +1,3 @@
-const fs = require('fs');
 const {configure} = require('japa');
 
 const iocResolver = require('@adonisjs/lucid/lib/iocResolver');
@@ -9,27 +8,27 @@ const LucidProvider = require('@adonisjs/lucid/providers/LucidProvider');
 const RedisProvider = require('@adonisjs/redis/providers/RedisProvider');
 const TraitProvider = require('.');
 
-const {database, redis, sqliteFilePath} = require('./test/_utils');
-const sqliteJournalFilePath = `${sqliteFilePath}-journal`;
+const {
+  redisConfig,
+  databaseConfig,
+  sqliteConfig,
+  testFiles,
+  removeTempFile,
+  redisConnectionNames,
+} = require('./test/_utils');
 
-const testFiles = () => {
-  const envFiles = process.env.TEST_FILES;
-  if (envFiles == null) {
-    return ['test/*.spec.js'];
-  }
-  return envFiles.trim().split(',').map((i) => i.trim());
-};
-
-const removeTempFile = (fileName) => new Promise((resolve) => fs.unlink(fileName, () => resolve()));
 
 configure({
-  files: testFiles(),
+  files: testFiles,
   bail: process.env.TEST_BAIL == null,
   before: [
     async () => {
+      if (sqliteConfig.inMemory) {
+        return;
+      }
       await Promise.all([
-        removeTempFile(sqliteFilePath),
-        removeTempFile(sqliteJournalFilePath),
+        removeTempFile(sqliteConfig.filePath),
+        removeTempFile(sqliteConfig.journalPath),
       ]);
     },
     () => {
@@ -44,8 +43,8 @@ configure({
     },
     () => {
       const config = fold.ioc.use('Config');
-      config.set('database', database);
-      config.set('redis', {...redis, loadScript: ['local', 'anotherLocal']});
+      config.set('database', databaseConfig);
+      config.set('redis', {...redisConfig, loadScript: redisConnectionNames});
     },
     async () => {
       // Database
@@ -70,12 +69,15 @@ configure({
       const Database = fold.ioc.use('Database');
       const Redis = fold.ioc.use('Redis');
       await Database.close();
-      await Redis.quit(['local', 'anotherLocal']);
+      await Redis.quit([redisConnectionNames]);
     },
     async () => {
+      if (sqliteConfig.inMemory) {
+        return;
+      }
       await Promise.all([
-        removeTempFile(sqliteFilePath),
-        removeTempFile(sqliteJournalFilePath),
+        removeTempFile(sqliteConfig.filePath),
+        removeTempFile(sqliteConfig.journalPath),
       ]);
     },
   ],
