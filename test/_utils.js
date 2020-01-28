@@ -14,6 +14,7 @@ const e = (envName, defaultValue) => (process.env[`APP_${envName}`] || defaultVa
 
 /**
  * Remove a file by full path, whether file exists or not
+ *
  * @param {string} fileName
  * @return {Promise<void>}
  */
@@ -21,11 +22,14 @@ const removeTempFile = (fileName) => new Promise((resolve) => fs.unlink(fileName
 
 /**
  * Configuration object for Sqlite
- * @property {object} connectionConfig - connection config for knex
- * @property {string|null} journalPath - path of sqlite journal
- * @property {bool} inMemory - whether sqlite is in memory or disk
+ *
+ * @property {object} sqliteConfig
+ * @property {object} sqliteConfig.connectionConfig - connection config for knex
+ * @property {string|null} sqliteConfig.journalPath - path of sqlite journal
+ * @property {string|null} sqliteConfig.filePath - path of sqlite db file
+ * @property {bool} sqliteConfig.inMemory - whether sqlite is in memory or disk
  */
-const {connectionConfig, journalPath, inMemory} = (() => {
+const sqliteConfig = (() => {
   let connectionConfig = e('SQLITE_DB_PATH', ':memory:');
   const inMemory = connectionConfig === ':memory:';
 
@@ -42,6 +46,7 @@ const {connectionConfig, journalPath, inMemory} = (() => {
     connectionConfig,
     journalPath,
     inMemory,
+    filePath: inMemory ? null : connectionConfig.filename,
   };
 })();
 
@@ -49,8 +54,8 @@ const {connectionConfig, journalPath, inMemory} = (() => {
  * Generated list of file path to included to test
  */
 const testFiles = (() => {
-  const envFiles = process.env.TEST_FILES;
-  if (envFiles == null) {
+  const envFiles = e('TEST_FILES', '');
+  if (envFiles === '') {
     return ['test/*.spec.js'];
   }
   return envFiles.trim().split(',').map((i) => i.trim());
@@ -62,7 +67,7 @@ const testFiles = (() => {
 const DB_CONFIG = {
   connection: e('DB', 'sqlite3'),
 
-  sqlite3: {client: 'sqlite3', connection: connectionConfig},
+  sqlite3: {client: 'sqlite3', connection: sqliteConfig.connectionConfig},
 
   mysql: {
     client: 'mysql',
@@ -108,12 +113,9 @@ const REDIS_CONFIG = {
 module.exports = {
   redisConfig: REDIS_CONFIG,
   databaseConfig: DB_CONFIG,
-  sqliteConfig: {
-    inMemory,
-    journalPath,
-    filePath: inMemory ? null : connectionConfig.filename,
-  },
   redisConnectionNames: Object.keys(REDIS_CONFIG).filter((i) => i !== 'connection'),
+  sqliteConfig,
   testFiles,
   removeTempFile,
+  testBail: e('TEST_BAIL', '') === '',
 };

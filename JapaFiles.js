@@ -11,16 +11,17 @@ const TraitProvider = require('.');
 const {
   redisConfig,
   databaseConfig,
+  redisConnectionNames,
   sqliteConfig,
   testFiles,
   removeTempFile,
-  redisConnectionNames,
+  testBail,
 } = require('./test/_utils');
 
 
 configure({
   files: testFiles,
-  bail: process.env.TEST_BAIL == null,
+  bail: testBail,
   before: [
     async () => {
       if (sqliteConfig.inMemory) {
@@ -69,7 +70,7 @@ configure({
       const Database = fold.ioc.use('Database');
       const Redis = fold.ioc.use('Redis');
       await Database.close();
-      await Redis.quit([redisConnectionNames]);
+      await Redis.quit(redisConnectionNames);
     },
     async () => {
       if (sqliteConfig.inMemory) {
