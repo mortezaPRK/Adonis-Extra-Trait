@@ -41,10 +41,10 @@ const REDIS_CONFIG = {
     keyPrefix: '',
   },
   anotherLocal: {
-    host: process.env.APP_REDIS_HOST || 'redis',
+    host: process.env.APP_REDIS_HOST || 'redis2',
     port: process.env.APP_REDIS_PORT || '6379',
     password: null,
-    db: 1,
+    db: 0,
     keyPrefix: '',
   },
 };
