@@ -226,7 +226,7 @@ test.group('Provider', () => {
     );
     assert.strictEqual(
         error.message,
-        'unknown option',
+        'Unknown option provided for loadScript',
         'another error thrown!',
     );
 
@@ -251,7 +251,7 @@ test.group('Provider', () => {
     );
     assert.strictEqual(
         errors.message,
-        'unknown option',
+        'Unknown option provided for loadScript',
         'another error thrown!',
     );
 

@@ -36,14 +36,12 @@ test.group('CachedAttribute', (group) => {
       table.bool('f3').notNullable();
       table.timestamps();
     });
-    await Database.close();
   });
 
   group.afterEach(async () => {
     const Database = ioc.use('Database');
     await Database.table('users').truncate();
     await Database.table('posts').truncate();
-    await Database.close();
 
     const Redis = ioc.use('Redis');
     await Promise.all([
@@ -63,7 +61,6 @@ test.group('CachedAttribute', (group) => {
     const Database = ioc.use('Database');
     await Database.schema.dropTable('users');
     await Database.schema.dropTable('posts');
-    await Database.close();
   });
 
   test('Redis custom command SHA', async (assert) => {
