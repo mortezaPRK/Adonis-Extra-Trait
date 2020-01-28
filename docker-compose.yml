@@ -31,3 +31,9 @@ services:
     restart: always
     networks:
       - web
+
+  redis2:
+    image: redis:5-alpine
+    restart: always
+    networks:
+      - web

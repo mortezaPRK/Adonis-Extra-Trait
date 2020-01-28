@@ -24,13 +24,11 @@ class TraitProvider extends ServiceProvider {
       };
     });
 
-    this.app.singleton('Prk/Helper/RedisCustomCommandDetail', () => {
-      return {
-        command: REDIS_COMMAND,
-        hash: REDIS_COMMAND_HASH,
-        numOfKeys: REDIS_COMMAND_KEYS,
-      };
-    });
+    this.app.singleton('Prk/Helper/RedisCustomCommandDetail', () => ({
+      command: REDIS_COMMAND,
+      hash: REDIS_COMMAND_HASH,
+      numOfKeys: REDIS_COMMAND_KEYS,
+    }));
   }
 
   async boot() {
@@ -64,11 +62,11 @@ class TraitProvider extends ServiceProvider {
     /**
      * use Redis Provider, with another connection names
      */
-    if (Array.isArray(loadScript)) {
+    if (Array.isArray(loadScript) && loadScript.length > 0) {
       return Promise.all(loadScript.map((ls) => loader(Redis.connection(ls))));
     }
 
-    throw new Error('unknown option');
+    throw new Error('Unknown option provided for redis custom command');
   }
 }
 
