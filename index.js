@@ -66,7 +66,7 @@ class TraitProvider extends ServiceProvider {
       return Promise.all(loadScript.map((ls) => loader(Redis.connection(ls))));
     }
 
-    throw new Error('Unknown option provided for redis custom command');
+    throw new Error('Unknown option provided for loadScript');
   }
 }
 
