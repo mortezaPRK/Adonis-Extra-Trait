@@ -9,5 +9,3 @@
 * add badges (test, version, last version of dependencies usage)
 * make this a typescript package (!)
 * add ci (Travis, Circle or Gitlab)
-* test boot options
-* sqlite in memory

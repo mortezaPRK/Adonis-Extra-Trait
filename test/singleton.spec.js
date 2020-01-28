@@ -15,21 +15,18 @@ test.group('Singleton', (group) => {
       table.increments('pk');
       table.timestamps();
     });
-    await Database.close();
   });
 
   group.afterEach(async () => {
     const Database = ioc.use('Database');
     await Database.table('users').truncate();
     await Database.table('posts').truncate();
-    await Database.close();
   });
 
   group.after(async () => {
     const Database = ioc.use('Database');
     await Database.schema.dropTable('users');
     await Database.schema.dropTable('posts');
-    await Database.close();
   });
 
   test('Registration', async (assert) => {

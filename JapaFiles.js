@@ -10,6 +10,7 @@ const RedisProvider = require('@adonisjs/redis/providers/RedisProvider');
 const TraitProvider = require('.');
 
 const {database, redis, sqliteFilePath} = require('./test-config');
+const sqliteJournalFilePath = `${sqliteFilePath}-journal`;
 
 const testFiles = () => {
   const envFiles = process.env.TEST_FILES;
@@ -19,18 +20,17 @@ const testFiles = () => {
   return envFiles.trim().split(',').map((i) => i.trim());
 };
 
+const removeTempFile = (fileName) => new Promise((resolve) => fs.unlink(fileName, () => resolve()));
+
 configure({
   files: testFiles(),
   bail: process.env.TEST_BAIL == null,
   before: [
-    () => {
-      if (fs.existsSync(sqliteFilePath)) {
-        fs.unlinkSync(sqliteFilePath);
-      }
-      const journal = `${sqliteFilePath}-journal`;
-      if (fs.existsSync(journal)) {
-        fs.unlinkSync(journal);
-      }
+    async () => {
+      await Promise.all([
+        removeTempFile(sqliteFilePath),
+        removeTempFile(sqliteJournalFilePath),
+      ]);
     },
     () => {
       // Resolver
@@ -71,14 +71,12 @@ configure({
       const Redis = fold.ioc.use('Redis');
       await Database.close();
       await Redis.quit(['local', 'anotherLocal']);
-
-      if (fs.existsSync(sqliteFilePath)) {
-        fs.unlinkSync(sqliteFilePath);
-      }
-      const journal = `${sqliteFilePath}-journal`;
-      if (fs.existsSync(journal)) {
-        fs.unlinkSync(journal);
-      }
+    },
+    async () => {
+      await Promise.all([
+        removeTempFile(sqliteFilePath),
+        removeTempFile(sqliteJournalFilePath),
+      ]);
     },
   ],
 });

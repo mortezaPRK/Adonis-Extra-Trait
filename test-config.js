@@ -1,15 +1,25 @@
 const path = require('path');
 
-const SQLITE_DB_PATH = path.join(__dirname, 'test.sqlite3');
+let SQLITE = (process.env.SQLITE_DB_PATH || ':memory:').trim();
+
+if (SQLITE !== ':memory:') {
+  if (!SQLITE.startsWith('/')) {
+    SQLITE = path.join(__dirname, SQLITE);
+  }
+  SQLITE = {filename: SQLITE};
+}
+// const SQLITE_DB_PATH = path.join(__dirname, 'test.sqlite3');
 
 const DB_CONFIG = {
   connection: process.env.APP_DB || 'sqlite3',
 
   sqlite3: {
     client: 'sqlite3',
-    connection: {
-      filename: SQLITE_DB_PATH,
-    },
+    connection: SQLITE,
+    // connection: {
+    //   filename: SQLITE_DB_PATH,
+    // },
+    // connection: ':memory:',
   },
 
   mysql: {
@@ -53,5 +63,5 @@ const REDIS_CONFIG = {
 module.exports = {
   redis: REDIS_CONFIG,
   database: DB_CONFIG,
-  sqliteFilePath: SQLITE_DB_PATH,
+  sqliteFilePath: SQLITE,
 };
