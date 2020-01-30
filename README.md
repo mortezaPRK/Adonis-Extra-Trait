@@ -49,8 +49,8 @@ This trait is much like `NoTimestamp` trait provided by Adonis.
    
    | `option`  | Required | Type | Default |                Description                    |
    |:---------:|:--------:|:----:|:-------:|:---------------------------------------------:|
-   | createdAt |    ❌    | bool | `false` | set `true` if model has no `created_at` field |
-   | updatedAt |    ❌    | bool | `false` | set `true` if model has no `updated_at` field |
+   | createdAt |    ❌    | bool | `false` | set `true` if the model has no `created_at` field |
+   | updatedAt |    ❌    | bool | `false` | set `true` if the model has no `updated_at` field |
 
 
 <hr>
@@ -114,7 +114,7 @@ This is useful when you want to keep set of values in DB and also have a history
 
 Cache last saved values in Redis.
 
-This trait __requires__ `Singleton` to get registered in the model (and it should register before this one). also `Primary Key` of model __must__ be an integer value.
+This trait __requires__ `Singleton` to get registered in the model (must be registered before this one). also `Primary Key` of model __must__ be an integer value.
 
 #### Register:
 
@@ -196,15 +196,15 @@ This trait __requires__ `Singleton` to get registered in the model (and it shoul
 
 * `Model.warmUp` Generates cache, removing old values:
    * use this method to regenerate cache
-   * Example: to populate cache in server startup
-   * Example: remove old cache value when a transaction fails
+     * Example: to populate cache in server startup
+     * Example: remove old cache value when a transaction rolls back
 
 #### Known Limitations:
 * Redis cluster is not tested and may not work as expected
-* Cache will return invalid value, if DB transaction fails (run `Model.warmUp` to fix it for now)
+* Cache will return invalid value, if DB transaction rolls back (run `Model.warmUp` to fix it for now)
 
 #### FAQ:
-1. How to use another connection name for redis:
+1. How to use another connection for redis:
    
    Pass `Redis.connection('nameOfConnection')` to trait option:
    ```js
@@ -223,12 +223,12 @@ This trait __requires__ `Singleton` to get registered in the model (and it shoul
    }
    ```
 
-2. I don't want to use `Redis` provider from Adonis, but `ioredis` instance:
+2. I don't want to use `Redis` provider from Adonis, but an `ioredis` instance:
    
-   * Pass Redis like object to trait option:
+   * Pass ioRedis to trait option:
       ```js
       const Model = use('Model');
-      const ioRedis = require('../ioredis');
+      const ioRedis = require('../ioredis'); // <-- this is an ioredis instance
       
       class Post extends Model {
           static boot() {
@@ -248,7 +248,7 @@ This trait __requires__ `Singleton` to get registered in the model (and it shoul
       await redisCommandLoader(ioRedis);
       ```
 
-3. I don't want to use neither `Redis` provider from Adonis nor `ioredis`:
+3. I don't want to use neither `Redis` provider from Adonis nor an `ioredis` instance:
    
    * Pass Redis like object to trait option:
       ```js
@@ -329,9 +329,9 @@ This trait __requires__ `Singleton` to get registered in the model (and it shoul
      };
      ```
      
-     now, package will automatically register command in Redis.
+     now, provider will automatically register command in Redis.
      
-   * If you use Redis provider from Adonis and now what you are doing:
+   * If you use Redis provider from Adonis and know what you are doing:
    
      with a config file like following:
      ```js
@@ -387,11 +387,15 @@ This trait __requires__ `Singleton` to get registered in the model (and it shoul
      const {command,hash,numOfKeys} = use('Prk/Helper/RedisCustomCommandDetail');
      ```
 
-     now you should register script using you library
+     now you should register script using your library
+
+     ```js
+     const redisClient = require('another-redis-lib');
+     redisClient.aMethodWhichLoadsLuaScript(command);
+     ```
      
 ## ToDo:
 * test for redis cluster
-* publish to npm
 * add badges (test, version, last version of dependencies usage)
 * make this a typescript package (!)
 * add ci (Travis, Circle or Gitlab)
