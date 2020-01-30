@@ -49,21 +49,24 @@ class TraitProvider extends ServiceProvider {
      * use Redis Provider
      */
     if (loadScript === true) {
-      return loader(Redis);
+      await loader(Redis);
+      return Redis.close(this.Config.get('redis.connection'));
     }
 
     /**
      * use Redis Provider, with another connection name
      */
     if (typeof(loadScript) === 'string') {
-      return loader(Redis.connection(loadScript));
+      await loader(Redis.connection(loadScript));
+      return Redis.close(loadScript);
     }
 
     /**
      * use Redis Provider, with another connection names
      */
     if (Array.isArray(loadScript) && loadScript.length > 0) {
-      return Promise.all(loadScript.map((ls) => loader(Redis.connection(ls))));
+      await Promise.all(loadScript.map((ls) => loader(Redis.connection(ls))));
+      return Redis.close(loadScript);
     }
 
     throw new Error('Unknown option provided for loadScript');
