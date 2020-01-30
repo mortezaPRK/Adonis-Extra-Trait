@@ -1,7 +1,7 @@
 {
-  "name": "@mortz.prk/adonis-extra-traits",
+  "name": "@mortz.prk/adonis-extra-trait",
   "version": "1.0.0",
-  "description": "",
+  "description": "Set of useful Traits for Adonis FrameWork",
   "main": "index.js",
   "scripts": {
     "lint": "eslint --quiet .",
@@ -10,10 +10,11 @@
     "test-all": "TEST_BAIL=1 node JapaFiles.js",
     "coverage": "nyc -s npm run --silent test-all",
     "report": "nyc report",
-    "coverage-percent": "npm run report | grep -e ^'All files' | awk '{ print \"TOTAL:\"($4+$6+$8+10)/4; }'"
+    "coverage-percent": "npm run report | grep -e ^'All files' | awk '{ print \"TOTAL:\"($4+$6+$8+10)/4; }'",
+    "publish": "npm publish --access public"
   },
   "author": "Morteza Pourkazemi",
-  "license": "mit",
+  "license": "MIT",
   "devDependencies": {
     "@adonisjs/fold": "^4.0.9",
     "@adonisjs/lucid": "^6.1.3",
@@ -27,5 +28,18 @@
     "nyc": "^15.0.0",
     "pg": "^7.17.1",
     "sqlite3": "^4.1.1"
-  }
+  },
+  "keywords": [
+    "adonis",
+    "trait"
+  ],
+  "homepage": "https://github.com/mortezaPRK/Adonis-Extra-Trait",
+  "bugs": {
+    "url": "https://github.com/mortezaPRK/Adonis-Extra-Trait/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mortezaPRK/Adonis-Extra-Trait.git"
+  },
+  "readme": "https://github.com/mortezaPRK/Adonis-Extra-Trait/blob/master/Readme.md"
 }
