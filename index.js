@@ -50,7 +50,7 @@ class TraitProvider extends ServiceProvider {
      */
     if (loadScript === true) {
       await loader(Redis);
-      return Redis.close(this.Config.get('redis.connection'));
+      return Redis.quit(Config.get('redis.connection'));
     }
 
     /**
@@ -58,7 +58,7 @@ class TraitProvider extends ServiceProvider {
      */
     if (typeof(loadScript) === 'string') {
       await loader(Redis.connection(loadScript));
-      return Redis.close(loadScript);
+      return Redis.quit(loadScript);
     }
 
     /**
@@ -66,7 +66,7 @@ class TraitProvider extends ServiceProvider {
      */
     if (Array.isArray(loadScript) && loadScript.length > 0) {
       await Promise.all(loadScript.map((ls) => loader(Redis.connection(ls))));
-      return Redis.close(loadScript);
+      return Redis.quit(loadScript);
     }
 
     throw new Error('Unknown option provided for loadScript');
