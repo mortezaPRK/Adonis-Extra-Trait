@@ -1,6 +1,6 @@
 {
   "name": "@mortz.prk/adonis-extra-trait",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Set of useful Traits for Adonis FrameWork",
   "main": "index.js",
   "scripts": {
