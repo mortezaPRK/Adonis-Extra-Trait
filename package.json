@@ -1,6 +1,6 @@
 {
   "name": "@mortz.prk/adonis-extra-trait",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Set of useful Traits for Adonis FrameWork",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mortezaPRK/Adonis-Extra-Trait.git"
+    "url": "git+https://github.com/mortezaPRK/Adonis-Extra-Trait.git"
   },
-  "readme": "https://github.com/mortezaPRK/Adonis-Extra-Trait/blob/master/README.md"
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {}
 }
