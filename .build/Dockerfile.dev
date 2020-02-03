@@ -21,8 +21,12 @@ RUN [ -z "$EXTRA_PKGS" ] || (apk add --no-cache $EXTRA_PKGS && rm -rf /var/cache
 
 WORKDIR /app
 
+RUN mkdir node_modules && chown node:node -R /app
+
 ENV NODE_ENV=development
 
 USER node
+
+VOLUME [ "/app", "/app/node_modules" ]
 
 CMD exec /bin/sh -c "trap : TERM INT; (while true; do sleep 1000; done) & wait"
