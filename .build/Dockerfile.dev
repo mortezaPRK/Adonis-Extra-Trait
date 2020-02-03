@@ -21,7 +21,7 @@ RUN [ -z "$EXTRA_PKGS" ] || (apk add --no-cache $EXTRA_PKGS && rm -rf /var/cache
 
 WORKDIR /app
 
-RUN mkdir node_modules && chown node:node -R /app
+RUN mkdir node_modules  && echo '*' > node_modules/.gitignore && chown node:node -R /app
 
 ENV NODE_ENV=development
 
